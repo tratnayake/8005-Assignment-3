@@ -1,0 +1,22 @@
+{
+  "name": "8005-Assignment-3",
+  "version": "1.0.0",
+  "description": "Port forwarding application",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/tratnayake/8005-Assignment-3"
+  },
+  "author": "tratnayake",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tratnayake/8005-Assignment-3/issues"
+  },
+  "homepage": "https://github.com/tratnayake/8005-Assignment-3",
+  "dependencies": {
+    "packet": "0.0.6"
+  }
+}
