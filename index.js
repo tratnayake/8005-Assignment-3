@@ -3,10 +3,10 @@ var net = require('net');
 //Get comand line arguments
 //To run use node index.js ssh 192.168.0.3 22 9022
 var arguments = process.argv.slice(2);
-var ip = arguments[2];
-var service = arguments[1]
-var listenPort = arguments[3]
-var remotePort = arguments[4];
+var ip = arguments[1];
+var service = arguments[0];
+var listenPort = arguments[2];
+var remotePort = arguments[3];
 
 // To send data out
   var server = net.createServer(function(conn){
