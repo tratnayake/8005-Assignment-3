@@ -13,25 +13,23 @@ var remotePort = arguments[4];
 
     var client = net.createConnection(remotePort,ip,
       function(){
-        console.log("Connected to the server!");
+        console.log(service + " client connected to the server!");
         }
     );
 
     //To get Data In
     client.on('data',function(data){
-      console.log("Got data back");
       //console.log(server);
       conn.write(data);
     });
 
-  console.log("client connected");
+  console.log(service + " client connected");
 
   conn.on('end',function(){
-    console.log("client disconnected");
+    console.log(service + " client disconnected");
   })
 
   conn.on('data',function(data){
-    console.log("Data on wire..");
     client.write(data);
 
   })
@@ -40,5 +38,5 @@ var remotePort = arguments[4];
 
 //Start the server
 server.listen(listenPort,function(){
-  console.log("Server listening on port 8080..");
+  console.log(service + " server listening on port 8080..");
 });
