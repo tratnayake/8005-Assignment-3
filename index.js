@@ -1,54 +1,112 @@
-var Cap = require('cap').Cap,
-    decoders = require('cap').decoders,
-    PROTOCOL = decoders.PROTOCOL;
+var net = require('net');
 
-var c = new Cap(),
-    device = Cap.findDevice('192.168.1.144'),
-    filter = 'tcp and dst port 8005',
-    bufSize = 10 * 1024 * 1024,
-    buffer = new Buffer(65535);
+// Sending shit out
+  var echoServer = net.createServer(function(conn){
 
-var linkType = c.open("eno16777736", filter, bufSize, buffer);
+    var echoClient = net.createConnection(9000,"192.168.0.21",
+      function(){
+        console.log("Connected to the echoServer!");
+        }
+    );
 
-c.setMinBytes && c.setMinBytes(0);
+    //Getting shit in
+    echoClient.on('data',function(data){
+      console.log("Got data back");
+      //console.log(echoServer);
+      conn.write(data);
+    });
 
-c.on('packet', function(nbytes, trunc) {
-  console.log('packet: length ' + nbytes + ' bytes, truncated? '
-              + (trunc ? 'yes' : 'no'));
+  console.log("echoClient connected");
 
-  var rawPacketData = buffer.slice(4, nbytes)
+  conn.on('end',function(){
+    console.log("echoClient disconnected");
+  })
 
-  if (linkType === 'ETHERNET') {
-    var ret = decoders.Ethernet(buffer);
+  conn.on('data',function(data){
+    console.log("Data on wire..");
+    echoClient.write(data);
 
-    if (ret.info.type === PROTOCOL.ETHERNET.IPV4) {
-      console.log('Decoding IPv4 ...');
-
-      ret = decoders.IPV4(buffer, ret.offset);
-      console.log('from: ' + ret.info.srcaddr + ' to ' + ret.info.dstaddr);
-
-      if (ret.info.protocol === PROTOCOL.IP.TCP) {
-        var datalen = ret.info.totallen - ret.hdrlen;
-
-        console.log('Decoding TCP ...');
-
-        ret = decoders.TCP(buffer, ret.offset);
-        console.log(' from port: ' + ret.info.srcport + ' to port: ' + ret.info.dstport);
-        datalen -= ret.hdrlen;
-        console.log(buffer.toString('binary', ret.offset, ret.offset + datalen));
-
-        console.log(rawPacketData);
+  })
+});
 
 
-      } else if (ret.info.protocol === PROTOCOL.IP.UDP) {
-        console.log('Decoding UDP ...');
+////
+// Sending shit out
+  var httpServer = net.createServer(function(conn){
 
-        ret = decoders.UDP(buffer, ret.offset);
-        console.log(' from port: ' + ret.info.srcport + ' to port: ' + ret.info.dstport);
-        console.log(buffer.toString('binary', ret.offset, ret.offset + ret.info.length));
-      } else
-        console.log('Unsupported IPv4 protocol: ' + PROTOCOL.IP[ret.info.protocol]);
-    } else
-      console.log('Unsupported Ethertype: ' + PROTOCOL.ETHERNET[ret.info.type]);
-  }
+    console.log("Something happened on HTTP...");
+
+    var httpClient = net.createConnection(9080,"192.168.0.21",
+      function(){
+        console.log("Connected to the httpServer!");
+        }
+    );
+
+    //Getting shit in
+    httpClient.on('data',function(data){
+      console.log("Got data back");
+      //console.log(httpServer);
+      conn.write(data);
+    });
+
+  console.log("httpClient connected");
+
+  conn.on('end',function(){
+    console.log("httpClient disconnected");
+  })
+
+  conn.on('data',function(data){
+    console.log("Data on wire..");
+    httpClient.write(data);
+
+  })
+});
+
+
+////
+// Sending shit out
+  var sshServer = net.createServer(function(conn){
+
+    console.log("Something happened on HTTP...");
+
+    var sshClient = net.createConnection(9022,"192.168.0.21",
+      function(){
+        console.log("Connected to the sshServer!");
+        }
+    );
+
+    //Getting shit in
+    sshClient.on('data',function(data){
+      console.log("Got data back");
+      //console.log(sshServer);
+      conn.write(data);
+    });
+
+  console.log("sshClient connected");
+
+  conn.on('end',function(){
+    console.log("sshClient disconnected");
+  })
+
+  conn.on('data',function(data){
+    console.log("Data on wire..");
+    sshClient.write(data);
+
+  })
+});
+
+
+
+//Start the echoServer
+echoServer.listen(8080,function(){
+  console.log("Server listening on port 8080..");
+});
+
+//Start the echoServer
+httpServer.listen(80,function(){
+  console.log("HTTP Server listening on port 80..");
+});
+//Start the SSHServer
+sshServer.listen(22,function(){
+  console.log("SSH Server listening on port 22..");
 });
