@@ -1,112 +1,44 @@
 var net = require('net');
 
-// Sending shit out
-  var echoServer = net.createServer(function(conn){
+//Get comand line arguments
+//To run use node index.js ssh 192.168.0.3 22 9022
+var arguments = process.argv.slice(2);
+var ip = arguments[2];
+var service = arguments[1]
+var listenPort = arguments[3]
+var remotePort = arguments[4];
 
-    var echoClient = net.createConnection(9000,"192.168.0.21",
+// To send data out
+  var server = net.createServer(function(conn){
+
+    var client = net.createConnection(remotePort,ip,
       function(){
-        console.log("Connected to the echoServer!");
+        console.log("Connected to the server!");
         }
     );
 
-    //Getting shit in
-    echoClient.on('data',function(data){
+    //To get Data In
+    client.on('data',function(data){
       console.log("Got data back");
-      //console.log(echoServer);
+      //console.log(server);
       conn.write(data);
     });
 
-  console.log("echoClient connected");
+  console.log("client connected");
 
   conn.on('end',function(){
-    console.log("echoClient disconnected");
+    console.log("client disconnected");
   })
 
   conn.on('data',function(data){
     console.log("Data on wire..");
-    echoClient.write(data);
+    client.write(data);
 
   })
 });
 
 
-////
-// Sending shit out
-  var httpServer = net.createServer(function(conn){
-
-    console.log("Something happened on HTTP...");
-
-    var httpClient = net.createConnection(9080,"192.168.0.21",
-      function(){
-        console.log("Connected to the httpServer!");
-        }
-    );
-
-    //Getting shit in
-    httpClient.on('data',function(data){
-      console.log("Got data back");
-      //console.log(httpServer);
-      conn.write(data);
-    });
-
-  console.log("httpClient connected");
-
-  conn.on('end',function(){
-    console.log("httpClient disconnected");
-  })
-
-  conn.on('data',function(data){
-    console.log("Data on wire..");
-    httpClient.write(data);
-
-  })
-});
-
-
-////
-// Sending shit out
-  var sshServer = net.createServer(function(conn){
-
-    console.log("Something happened on HTTP...");
-
-    var sshClient = net.createConnection(9022,"192.168.0.21",
-      function(){
-        console.log("Connected to the sshServer!");
-        }
-    );
-
-    //Getting shit in
-    sshClient.on('data',function(data){
-      console.log("Got data back");
-      //console.log(sshServer);
-      conn.write(data);
-    });
-
-  console.log("sshClient connected");
-
-  conn.on('end',function(){
-    console.log("sshClient disconnected");
-  })
-
-  conn.on('data',function(data){
-    console.log("Data on wire..");
-    sshClient.write(data);
-
-  })
-});
-
-
-
-//Start the echoServer
-echoServer.listen(8080,function(){
+//Start the server
+server.listen(listenPort,function(){
   console.log("Server listening on port 8080..");
-});
-
-//Start the echoServer
-httpServer.listen(80,function(){
-  console.log("HTTP Server listening on port 80..");
-});
-//Start the SSHServer
-sshServer.listen(22,function(){
-  console.log("SSH Server listening on port 22..");
 });
