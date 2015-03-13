@@ -18,6 +18,7 @@
   "homepage": "https://github.com/tratnayake/8005-Assignment-3",
   "dependencies": {
     "packet": "0.0.6",
-    "cap": "0.0.12"
+    "cap": "0.0.12",
+    "line-reader": "~0.2.4"
   }
 }
