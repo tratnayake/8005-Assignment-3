@@ -1,72 +1,54 @@
 var net = require('net');
-var fs = require('fs');
-var lineReader = require('line-reader');
 
-var services = new Array();
+var services = require('./config'),
+  serviceElement = [];
 
-//MAIN//
-//Read from config file
-lineReader.eachLine(__dirname+'/configfile.txt', function(line, last) {
+console.log("Start the listening servers and begin forwarding...");
 
-  if(line[0] !="/"){
-    arguments = line.split(",");
-    console.log("The arguments are "+arguments);
-    var ip = arguments[1];
-    var service = arguments[0];
-    var listenPort = arguments[2];
-    var remotePort = arguments[3];
-
-    var serviceElement = {ip: ip, service: service, listenPort: listenPort, remotePort: remotePort};
-    services.push(serviceElement);
-
-
-  }
-
-  if(last){
-    console.log("Start the listening servers and begin forwarding...");
-
-    // Start listening & then start the server
-    for (var i = 0; i < services.length; i++) {
-      var serviceElement = services[i];
-      listenPackets(serviceElement.remotePort,serviceElement.ip,serviceElement.service,serviceElement.listenPort,startPortServer);
-    }
-
-
-
-  }
-});
-
+// Start listening & then start the server
+for (var i = 0; i < services.length; i++) {
+  serviceElement = services[i];
+  listenPackets(serviceElement.remotePort,serviceElement.ip,serviceElement.service,serviceElement.listenPort,startPortServer);
+}
 
 function listenPackets(remotePort,ip,service,listenPort,startPortServer){
 
   // To send data out
-    var server = net.createServer(function(conn){
+  var server = net.createServer(function(conn){
 
-      var client = net.createConnection(remotePort,ip,
-        function(){
-          console.log(service + " client connected to the server!");
-          }
-      );
+    var client = net.createConnection(remotePort,ip,
+      function(){
+        console.log(service + " client connected to the server!");
+        }
+    );
 
-      //To get Data In
-      client.on('data',function(data){
-        //console.log(server);
-        conn.write(data);
-      });
+    //To get Data In
+    client.on('data',function(data){
+      //console.log(server);
+      conn.write(data);
+    });
+
+    client.on('error', function(err) {
+      console.log(service + ' connector error: ' + err.message);
+      if (err.code == 'ENOTFOUND') {
+        conn.end('ERROR: Remote host is unavailable' + "\n");
+      } else {
+        conn.write('ERROR: Remote host error' + "\n");
+      }
+    });
 
     console.log(service + " client connected");
 
     conn.on('end',function(){
       console.log(service + " client disconnected");
-    })
+    });
 
     conn.on('data',function(data){
       client.write(data);
-
-    })
+    });
   });
 
-startPortServer(server,service,listenPort);
+  startPortServer(server,service,listenPort);
 
 }
 
