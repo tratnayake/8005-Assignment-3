@@ -1,5 +1,0 @@
-//Please ensure the format is: service name,remote ip address, localPort, remotePort
-//e.g. ssh,192.168.0.3,22,9022
-http,192.168.0.21,80,9080
-ssh,192.168.0.21,22,9022
-echo,192.168.0.21,8001,8000
